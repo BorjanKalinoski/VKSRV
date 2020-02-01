@@ -9,8 +9,8 @@ EMailSender emailSend(email, emailPassword);
 
 bool emailSent = false;
 
-const char* ssid = "phone";
-const char* password = "12345678";
+const char* ssid = "Boki";
+const char* password = "01011962";
 
 const int trigPin1 = 2;  //D4
 const int echoPin1 = 0;  //D3
@@ -50,29 +50,31 @@ void setup() {
 }
 
 void loop() {
-  delay(500);
+  delay(2500);
 
-  //Serial.print("Distance: ");
+  Serial.print("Distance: ");
   //Serial.println(getSonar());
+  bool dist1=mailRecieved(getSonar(trigPin1, echoPin1));
+  delay(1000);
+  bool dist2=mailRecieved(getSonar(trigPin2, echoPin2));
 
-  if((mailRecieved(getSonar(trigPin1, echoPin1)) || mailRecieved(getSonar(trigPin2, echoPin2))) && emailSent == false)
+  if(( dist1 ||  dist2 ) && emailSent == false)
   {
     EMailSender::EMailMessage message;
-    message.subject = "Soggetto";
-    message.message = "Ciao come stai<br>io bene.";
+    message.subject = "Smart Mailbox Notification";
+    message.message = "You recieved a mail. Check your mailbox";
     EMailSender::Response resp = emailSend.send(email, message);
 
     emailSent = true;
 
     Serial.println("Sending status: ");
-
-    Serial.println(resp.status);
-    Serial.println(resp.code);
+//
+//    Serial.println(resp.status);
+//    Serial.println(resp.code);
     Serial.println(resp.desc);
-  }
-
-  else
+  } else if(!dist1 && !dist2)
   {
+    Serial.println("Email sent - false");
     emailSent = false;
   }
 }
@@ -92,7 +94,7 @@ float getSonar(int trigPin, int echoPin){
 
 bool mailRecieved(float distance)
 {
-  if(distance < 5 || distance > 150) 
+  if(distance < 8.05 || distance > 8.6) 
     return true;
    return false;  
 }
